@@ -56,8 +56,10 @@ public:
 
     void setPageNavigation(QPdfPageNavigation *pageNavigation);
 
-private slots:
+public slots:
     void onCurrentPageChanged(int page);
+
+private slots:
     void pageNumberEdited();
 
 private:

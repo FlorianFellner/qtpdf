@@ -27,7 +27,8 @@ SOURCES += \
     qpdfbookmarkmodel.cpp \
     qpdfdocument.cpp \
     qpdfpagenavigation.cpp \
-    qpdfpagerenderer.cpp
+    qpdfpagerenderer.cpp \
+    qpdfwriter.cpp
 
 HEADERS += \
     qpdfbookmarkmodel.h \
@@ -37,4 +38,5 @@ HEADERS += \
     qpdfnamespace.h \
     qpdfpagenavigation.h \
     qpdfpagerenderer.h \
-    qtpdfglobal.h
+    qtpdfglobal.h \
+    qpdfwriter.h

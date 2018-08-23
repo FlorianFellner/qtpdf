@@ -53,6 +53,8 @@
 #include <QPointer>
 #include <QtWidgets/private/qabstractscrollarea_p.h>
 
+#include <QPdfDocumentRenderOptions>
+
 QT_BEGIN_NAMESPACE
 
 class QPdfPageRenderer;
@@ -107,6 +109,7 @@ public:
     QVector<int> m_cachedPagesLRU;
     int m_pageCacheLimit;
 
+    QPdfDocumentRenderOptions m_documentOptions;
     DocumentLayout m_documentLayout;
 
     qreal m_screenResolution; // pixels per point

@@ -95,6 +95,8 @@ public:
 
     Status status() const;
 
+    void save(QString path);
+
     void load(QIODevice *device);
     void setPassword(const QString &password);
     QString password() const;

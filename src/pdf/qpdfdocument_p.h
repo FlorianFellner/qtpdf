@@ -38,6 +38,7 @@
 #define QPDFDOCUMENT_P_H
 
 #include "qpdfdocument.h"
+#include "qpdfwriter.h"
 
 #include "public/fpdfview.h"
 #include "public/fpdf_dataavail.h"

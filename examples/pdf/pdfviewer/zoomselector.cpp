@@ -38,9 +38,13 @@
 
 #include <QLineEdit>
 
+/*!
+ * Constructs a new ZoomSelector with parent object \a parent.
+ */
 ZoomSelector::ZoomSelector(QWidget *parent)
     : QComboBox(parent)
 {
+    setEnabled(false);
     setEditable(true);
 
     addItem(QLatin1String("Fit Width"));
@@ -64,16 +68,34 @@ ZoomSelector::ZoomSelector(QWidget *parent)
             this, [this](){onCurrentTextChanged(lineEdit()->text()); });
 }
 
+/*!
+ * Sets the text to \a zoomFactor * 100 with an % at the end.
+ * Uses qRound() to get the an integer number.
+ * Emits onCurrentTextChanged(QString) (If it only sets the text without emitting this signal, the zoom actions
+ *                                      don't work properly after changing the zoom mode to "Fit Width" or "Fit Page".)
+ */
 void ZoomSelector::setZoomFactor(qreal zoomFactor)
 {
-    setCurrentText(QString::number(qRound(zoomFactor * 100)) + QLatin1String("%"));
+    QString text = QString::number(qRound(zoomFactor * 100)) + QLatin1String("%");
+    setCurrentText(text);
+    emit onCurrentTextChanged(text);
 }
 
+/*!
+ * Resets the zoomFactor to 1 (= 100%)
+ */
 void ZoomSelector::reset()
 {
     setCurrentIndex(8); // 100%
 }
 
+/*!
+ * Emits zoomModeChanged(QPdfView::ZoomMode) (and zoomFactorChanged(qreal) [if mode is custom])
+ *
+ * If the text equals "Fit Width" the mode will be QPdfView::FitToWidth.
+ * If the text equals "Fit Page" the mode will be QPdfView::FitInView.
+ * Else the mode will be QPdfView::CustomZoom and the zoomFactor is taken from the text field.
+ */
 void ZoomSelector::onCurrentTextChanged(const QString &text)
 {
     if (text == QLatin1String("Fit Width")) {

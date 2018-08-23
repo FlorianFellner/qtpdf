@@ -39,6 +39,7 @@
 
 #include <QLoggingCategory>
 #include <QMainWindow>
+#include <QtPdfWidgets>
 
 Q_DECLARE_LOGGING_CATEGORY(lcExample)
 
@@ -64,6 +65,7 @@ public:
 
 public slots:
     void open(const QUrl &docLocation);
+    void thumbnailClicked(int button);
 
 private slots:
     void bookmarkSelected(const QModelIndex &index);
@@ -78,6 +80,19 @@ private slots:
     void on_actionPrevious_Page_triggered();
     void on_actionNext_Page_triggered();
     void on_actionContinuous_triggered();
+    void on_actionPrint_triggered();
+    void on_actionSave_triggered();
+    void on_actionClose_triggered();
+
+    void on_actionRotateLeft_triggered();
+    void on_actionRotateRight_triggered();
+    void on_actionAnnotations_triggered();
+    void on_actionOptimiziedForLcd_triggered();
+    void on_actionGrayscale_triggered();
+    void on_actionForceHalftone_triggered();
+    void on_actionTextAliased_triggered();
+    void on_actionImageAliased_triggered();
+    void on_actionPathAliased_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -85,6 +100,12 @@ private:
     PageSelector *m_pageSelector;
 
     QPdfDocument *m_document;
+    int m_rotation = 0;
+
+    void setRotation(int rotation);
+    void setRenderFlag(QPdf::RenderFlag flag, bool enable);
+
+    QPdf::RenderFlags m_flags;
 };
 
 #endif // MAINWINDOW_H

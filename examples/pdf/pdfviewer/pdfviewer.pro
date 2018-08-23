@@ -1,17 +1,20 @@
 TEMPLATE = app
 TARGET = pdfviewer
-QT += core gui widgets pdfwidgets
+QT += core gui widgets widgets-private pdfwidgets printsupport
 
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
     pageselector.cpp \
-    zoomselector.cpp
+    zoomselector.cpp \
+    thumbnails.cpp
 
 HEADERS += \
     mainwindow.h \
     pageselector.h \
-    zoomselector.h
+    zoomselector.h \
+    thumbnails.h \
+    thumbnails_p.h
 
 FORMS += \
     mainwindow.ui
