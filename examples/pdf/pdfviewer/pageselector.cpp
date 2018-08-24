@@ -42,6 +42,9 @@
 #include <QPdfPageNavigation>
 #include <QToolButton>
 
+/*!
+ * Constructs a new PageSelector with parent object \a parent.
+ */
 PageSelector::PageSelector(QWidget *parent)
     : QWidget(parent)
     , m_pageNavigation(nullptr)
@@ -68,6 +71,9 @@ PageSelector::PageSelector(QWidget *parent)
     layout->addWidget(m_nextPageButton);
 }
 
+/*!
+ * Sets m_pageNavigation and connects the necessary signals with the corresponding slots.
+ */
 void PageSelector::setPageNavigation(QPdfPageNavigation *pageNavigation)
 {
     m_pageNavigation = pageNavigation;
@@ -86,14 +92,23 @@ void PageSelector::setPageNavigation(QPdfPageNavigation *pageNavigation)
     onCurrentPageChanged(m_pageNavigation->currentPage());
 }
 
+/*!
+ * Synchronizes the displayed text with \a page.
+ */
 void PageSelector::onCurrentPageChanged(int page)
 {
-    if (m_pageNavigation->pageCount() == 0)
+    if (m_pageNavigation->pageCount() == 0) {
         m_pageNumberEdit->setText(QString::number(0));
-    else
+        m_pageNumberEdit->setEnabled(false);
+    } else {
         m_pageNumberEdit->setText(QString::number(page + 1));
+        m_pageNumberEdit->setEnabled(true);
+    }
 }
 
+/*!
+ * Checks the edited text in the text field and navigates to the given page if possible.
+ */
 void PageSelector::pageNumberEdited()
 {
     if (!m_pageNavigation)
@@ -104,8 +119,11 @@ void PageSelector::pageNumberEdited()
     bool ok = false;
     const int pageNumber = text.toInt(&ok);
 
-    if (!ok)
+    if (!ok) {
         onCurrentPageChanged(m_pageNavigation->currentPage());
-    else
-        m_pageNavigation->setCurrentPage(qBound(0, pageNumber - 1, m_pageNavigation->pageCount() - 1));
+    } else if (pageNumber < 1 || pageNumber > m_pageNavigation->pageCount()) {
+        onCurrentPageChanged(m_pageNavigation->currentPage());
+    } else {
+        m_pageNavigation->setCurrentPage(pageNumber - 1);
+    }
 }

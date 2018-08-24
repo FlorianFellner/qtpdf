@@ -58,7 +58,7 @@ namespace QPdf {
         RenderForceHalftone = 0x008,
         RenderTextAliased = 0x010,
         RenderImageAliased = 0x020,
-        RenderPathAliased = 0x040
+        RenderPathAliased = 0x040,
     };
     Q_FLAG_NS(RenderFlag)
     Q_DECLARE_FLAGS(RenderFlags, RenderFlag)

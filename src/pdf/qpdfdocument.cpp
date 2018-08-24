@@ -95,6 +95,16 @@ QPdfDocumentPrivate::~QPdfDocumentPrivate()
         FPDF_DestroyLibrary();
 }
 
+/*!
+ * Creates a Writer object and saves a copy of this document to \a path.
+ */
+void QPdfDocument::save(QString path)
+{
+
+    Writer writer(path);
+    writer.saveAs(d->doc);
+}
+
 void QPdfDocumentPrivate::clear()
 {
     QPdfMutexLocker lock;

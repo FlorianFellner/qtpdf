@@ -46,6 +46,8 @@
 #include <QScrollBar>
 #include <QScroller>
 
+#include <QPdfDocumentRenderOptions>
+
 QT_BEGIN_NAMESPACE
 
 QPdfViewPrivate::QPdfViewPrivate()
@@ -60,6 +62,7 @@ QPdfViewPrivate::QPdfViewPrivate()
     , m_documentMargins(6, 6, 6, 6)
     , m_blockPageScrolling(false)
     , m_pageCacheLimit(20)
+    , m_documentOptions()
     , m_screenResolution(QGuiApplication::primaryScreen()->logicalDotsPerInch() / 72.0)
 {
 }
@@ -214,17 +217,28 @@ QPdfViewPrivate::DocumentLayout QPdfViewPrivate::calculateDocumentLayout() const
 
     // calculate page sizes
     for (int page = startPage; page < endPage; ++page) {
+
+        /*!
+         * Swaps the width and height of the page if it is rotated by 90 or 270 degrees.
+         */
+        QSizeF pageSizeF;
+        if (m_documentOptions.rotation() == 1 || m_documentOptions.rotation() == 3) {
+            pageSizeF = QSizeF(m_document->pageSize(page).height(), m_document->pageSize(page).width());
+        } else {
+            pageSizeF = QSizeF(m_document->pageSize(page));
+        }
+
         QSize pageSize;
         if (m_zoomMode == QPdfView::CustomZoom) {
-            pageSize = QSizeF(m_document->pageSize(page) * m_screenResolution * m_zoomFactor).toSize();
+            pageSize = QSizeF(pageSizeF * m_screenResolution * m_zoomFactor).toSize();
         } else if (m_zoomMode == QPdfView::FitToWidth) {
-            pageSize = QSizeF(m_document->pageSize(page) * m_screenResolution).toSize();
+            pageSize = QSizeF(pageSizeF * m_screenResolution).toSize();
             const qreal factor = (qreal(m_viewport.width() - m_documentMargins.left() - m_documentMargins.right()) / qreal(pageSize.width()));
             pageSize *= factor;
         } else if (m_zoomMode == QPdfView::FitInView) {
             const QSize viewportSize(m_viewport.size() + QSize(-m_documentMargins.left() - m_documentMargins.right(), -m_pageSpacing));
 
-            pageSize = QSizeF(m_document->pageSize(page) * m_screenResolution).toSize();
+            pageSize = QSizeF(pageSizeF * m_screenResolution).toSize();
             pageSize = pageSize.scaled(viewportSize, Qt::KeepAspectRatio);
         }
 
@@ -424,6 +438,37 @@ void QPdfView::setPageSpacing(int spacing)
     emit pageSpacingChanged(d->m_pageSpacing);
 }
 
+/*!
+ * Sets the rotation of the render options to 0, 90, 180 or 270 degrees.
+ * Invalidates the document layout and emits zoomFactorChanged(float).
+ */
+void QPdfView::setRotation(QPdf::Rotation rotation)
+{
+    Q_D(QPdfView);
+
+    if (d->m_documentOptions.rotation() == rotation)
+        return;
+
+    d->m_documentOptions.setRotation(rotation);
+    d->invalidateDocumentLayout();
+
+    emit zoomFactorChanged(d->m_zoomFactor);
+}
+
+/*!
+ * Sets the documents RenderFlags.
+ */
+void QPdfView::setRenderFlags(QPdf::RenderFlags flags)
+{
+    Q_D(QPdfView);
+
+    if(d->m_documentOptions.renderFlags() == flags)
+        return;
+
+    d->m_documentOptions.setRenderFlags(flags);
+    d->invalidatePageCache();
+}
+
 QMargins QPdfView::documentMargins() const
 {
     Q_D(const QPdfView);
@@ -463,7 +508,10 @@ void QPdfView::paintEvent(QPaintEvent *event)
                 const QImage &img = pageIt.value();
                 painter.drawImage(pageGeometry.topLeft(), img);
             } else {
-                d->m_pageRenderer->requestPage(page, pageGeometry.size());
+                /*!
+                 * Uses m_documentOptions when rendering a new page.
+                 */
+                d->m_pageRenderer->requestPage(page, pageGeometry.size(), d->m_documentOptions);
             }
         }
     }
